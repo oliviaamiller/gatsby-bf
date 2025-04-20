@@ -6,15 +6,15 @@ import { graphql } from "gatsby";
 import Layout from "../components/Layout";
 
 export const query = graphql`
-    {
-        contentfulVersion(name: { eq: "Production Version Number" }) {
-            number
-        }
+  {
+    contentfulVersion(name: { eq: "Production Version Number" }) {
+      number
     }
+  }
 `;
 
 const IndexPage = ({ data }) => {
-    return <Layout>Version: {data?.contentfulVersion?.number}</Layout>;
+  return <Layout>Version: {data?.contentfulVersion?.number}</Layout>;
 };
 
 export default IndexPage;

@@ -1,11 +1,10 @@
-
 const React = require("react");
-const Provider = require ('./src/components/Provider').default;
+const Provider = require("./src/components/Provider").default;
 /**
  * Implement Gatsby's Browser APIs in this file.
  *
  * See: https://www.gatsbyjs.org/docs/browser-apis/
- */ 
+ */
 
 // You can delete this file if you're not using it
 
@@ -14,5 +13,5 @@ const Provider = require ('./src/components/Provider').default;
 // const { GlobalStyles } = require("./src/designSystem/utils")
 
 exports.wrapRootElement = ({ element }) => {
-  return <Provider> {element} </Provider>
+  return <Provider> {element} </Provider>;
 };

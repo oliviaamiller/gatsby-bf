@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { Box, jsx } from "theme-ui";
+import { Box, jsx, Badge } from "theme-ui";
 import { graphql, Link, useStaticQuery } from "gatsby";
 import { bgImageSx } from "../sx/utils";
 import React from "react";
@@ -9,6 +9,8 @@ import { Navicon } from "@emotion-icons/evil/Navicon";
 import { Close } from "@emotion-icons/evil/Close";
 import { MobileNavContext } from "./Provider";
 import { useBreakpointIndex } from "@theme-ui/match-media";
+import { useLocation } from "@reach/router";
+import type { ThemeUICSSObject } from "theme-ui";
 
 const NavIcon = styled(Navicon)``;
 const CloseIcon = styled(Close)``;
@@ -16,187 +18,268 @@ const CloseIcon = styled(Close)``;
 const slug = require("slug");
 
 const Header = () => {
-    const data = useStaticQuery(
-        graphql`
-            query {
-                site {
-                    siteMetadata {
-                        title
-                        description
-                        author
-                    }
-                }
-                allContentfulHomePage {
-                    nodes {
-                        id
-                        seo {
-                            id
-                            title
-                            description
-                            keywords
-                        }
-                        logo {
-                            file {
-                                url
-                            }
-                        }
-                        images {
-                            id
-                            file {
-                                url
-                            }
-                        }
-                    }
-                }
-                contentfulNavigationMenu {
-                    pages {
-                        ... on ContentfulPage {
-                            slug
-                            name
-                        }
-                        ... on ContentfulCategory {
-                            slug
-                            name
-                        }
-                    }
-                }
+  const data = useStaticQuery(
+    graphql`
+      query {
+        site {
+          siteMetadata {
+            title
+            description
+            author
+          }
+        }
+        allContentfulHomePage {
+          nodes {
+            id
+            seo {
+              id
+              title
+              description
+              keywords
             }
-        `
-    );
+            logo {
+              file {
+                url
+              }
+            }
+            images {
+              id
+              file {
+                url
+              }
+            }
+          }
+        }
+        contentfulNavigationMenu {
+          pages {
+            ... on ContentfulPage {
+              slug
+              name
+            }
+            ... on ContentfulCategory {
+              slug
+              name
+            }
+          }
+        }
+      }
+    `
+  );
 
-    const { contentfulNavigationMenu, allContentfulHomePage, site } = data || {};
-    const { description } = site?.siteMetadata || {};
-    const { pages } = contentfulNavigationMenu || {};
-    const { logo } = allContentfulHomePage.nodes?.[0] || {};
+  const { contentfulNavigationMenu, allContentfulHomePage, site } = data || {};
+  const { description } = site?.siteMetadata || {};
+  const { pages } = contentfulNavigationMenu || {};
+  const { logo } = allContentfulHomePage.nodes?.[0] || {};
 
-    const { url } = logo.file;
+  const { url } = logo.file;
 
-    const { open: navOpen, toggleOpen, setIsOpen } = React.useContext(MobileNavContext) || {};
+  const { open: navOpen, toggleOpen, setIsOpen } =
+    React.useContext(MobileNavContext) || {};
 
-    const isMobile = useBreakpointIndex() <= 2;
+  const isMobile = useBreakpointIndex() === 0;
 
-    const hamburgerSx = {
-        display: ["block", "block", "none"],
-        position: "relative",
-        zIndex: [1000],
-        color: "medium",
-    };
-    const navSx = {
-        display: navOpen ? ["flex", "flex", "flex"] : ["none", "none", "flex"],
-        flexDirection: ["column", "column", "row"],
-        alignItems: ["center"],
-        justifyContent: ["center"],
-        position: ["absolute", "absolute", "relative"],
-        height: ["100vh", "100vh", "initial"],
-        zIndex: [100, 100, "initial"],
-        top: [0, 0, "initial"],
-        left: [0, 0, "initial"],
-        width: ["100%", "100%", "initial"],
+const hamburgerSx: ThemeUICSSObject = {
+  display: "block",
+  position: "relative",
+  zIndex: 1000,
+  color: "medium"
+};
 
-        backgroundColor: ["white", "white", "transparent"],
-        "a + a": {
-            mt: [2, 2, 0],
-            ml: [0, 0, 2],
-        },
-    };
 
-    return (
+
+  const blackIcon = {
+    width: "30px",
+    height: "30px",
+    borderRadius: "50%",
+    backgroundColor: "black",
+    display: "inline-block"
+  };
+
+    const whiteIcon = {
+    width: "30px",
+    height: "30px",
+    borderRadius: "50%",
+    backgroundColor: "white",
+    display: "inline-block",
+    border: "1px solid #aca79e"
+  };
+
+      const transparentIcon = {
+    width: "30px",
+    height: "30px",
+    borderRadius: "50%",
+    backgroundColor: "transparent",
+    display: "inline-block",
+    border: "1px solid #aca79e"
+  };
+
+const navSx: ThemeUICSSObject = {
+  display: ["flex", "flex", "flex"],
+  flexDirection: ["column", "row", "row"],
+  alignItems: ["center", "center", "center"],
+  justifyContent: ["center", "center", "center"],
+  position: ["absolute", "relative", "relative"],
+  height: ["100vh", "initial", "initial"],
+  zIndex: [100, "initial", "initial"],
+  top: [0, "initial", "initial"],
+  left: [0, "initial", "initial"],
+  width: ["100%", "initial", "initial"],
+  backgroundColor: ["white", "transparent", "transparent"],
+  "a + a": {
+    mt: [2, 0, 0],
+    ml: [0, 2, 2]
+  }
+};
+
+
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
+
+
+  return (
+    <Box
+      className="header"
+      sx={{
+        alignItems: "center",
+        display: "flex",
+        position: isMobile && isHomePage ? "absolute" : "relative",
+        width: "100%",
+        maxWidth: "650px",
+        margin: "0 auto",
+        px: [21, 0, 0]
+      }}
+    >
+      {isMobile ? (
+        // Mobile Header
         <Box
-            className="header"
-            sx={{
-                alignItems: "center",
-                display: "flex",
-                position: "relative",
-                width: "100%",
-                // SIZES - HEADER WIDTH
-                maxWidth: 9,
-                margin: "0 auto",
-                px: [21, 0, 0],
-            }}
+          sx={{
+            display: "flex",
+            flex: "1 1 auto",
+            alignItems: "center",
+            justifyContent: isHomePage ? "flex-end" : "space-between",
+            height: "100px",
+            width: "100%"
+          }}
         >
-            <Box
+          {!isHomePage ? (
+            <Link to="/">
+              <Box
                 sx={{
-                    flex: "1 1 auto",
-                    pt: [2, 7],
-                    pb: [2, 6],
+                  ...bgImageSx,
+                  textIndent: "-1000em",
+                  flex: "0 0 auto",
+                  height: "21px",
+                  backgroundPosition: "left -1px",
+                  width: "260px",
+                  backgroundImage: `url(${url})`
                 }}
-            >
-                <Box
-                    sx={{
-                        alignItems: "center",
-                        display: "flex",
+              >
+                {description}
+              </Box>
+            </Link>
+          ) : null}
 
-                        justifyContent: "space-between",
-                    }}
+   <Box sx={hamburgerSx} onClick={toggleOpen}>
+  {!navOpen ? (
+    isHomePage ? (
+      <Badge sx={whiteIcon} />
+    ) : (
+      <Badge sx={transparentIcon} />
+    )
+  ) : (
+    <Badge sx={blackIcon} />
+  )}
+</Box>
+
+          {navOpen && (
+            <Box sx={navSx} onClick={() => setIsOpen?.(false)}>
+              {pages?.map(page => (
+                <Link
+                  key={page.slug}
+                  to={`/${page.slug}`}
+                  sx={{
+                    textDecoration: "none",
+                    color: "medium",
+                    fontWeight: "bold",
+                    "&:hover, &.active_link": {
+                      color: "darkest"
+                    }
+                  }}
+                  activeClassName="active_link"
                 >
-                    <Link to="/">
-                        <Box
-                            sx={{
-                                ...bgImageSx,
-                                // letterSpacing: "-1000em",
-                                textIndent: "-1000em",
-                                flex: "0 0 auto",
-                                height: "21px",
-                                backgroundPosition: "left -1px",
-                                width: ["260px", "410px"],
-                                backgroundImage: `url(${url})`,
-                            }}
-                        >
-                            {description}
-                        </Box>
-                    </Link>
-
-                    <Box sx={hamburgerSx} onClick={toggleOpen}>
-                        {!navOpen ? <NavIcon size="30" /> : <CloseIcon size="30" />}
-                    </Box>
-
-                    <Box sx={navSx} onClick={isMobile ? () => setIsOpen?.(false) : undefined}>
-                        {pages &&
-                            pages.map((page) => (
-                                <Link
-                                    partiallyActive
-                                    sx={{
-                                        textDecoration: "none",
-                                        color: "medium",
-                                        "&:visited": {
-                                            color: "medium",
-                                        },
-                                        fontSize: ["16px", 0],
-                                        lineHeight: ["1.3", 1],
-                                        fontFamily: "body",
-                                        fontWeight: "bold",
-                                        letterSpacing: "1px",
-                                        "&:hover, &.active_link": {
-                                            color: "darkest",
-                                        },
-                                    }}
-                                    activeClassName="active_link"
-                                    key={page.slug}
-                                    to={`/${page.slug}`}
-                                >
-                                    {slug(page.slug)}
-                                </Link>
-                            ))}
-                    </Box>
-                </Box>
+                  {slug(page.slug)}
+                </Link>
+              ))}
             </Box>
-
-            <Global
-                styles={{
-                    body: {
-                        overflow: navOpen ? "hidden" : "auto",
-                    },
-                    ".slider-control-topleft": {
-                        width: "100%",
-                        height: "100%",
-                        display: "flex",
-                        justifyContent: "center",
-                        pointerEvents: "none !important",
-                    },
-                }}
-            />
+          )}
         </Box>
-    );
+      ) : (
+        // Desktop Header
+        <Box
+          sx={{
+            display: "flex",
+            flex: "1 1 auto",
+            alignItems: "center",
+            justifyContent: "space-between",
+            height: "165px",
+            width: "100%"
+          }}
+        >
+          <Link to="/">
+            <Box
+              sx={{
+                ...bgImageSx,
+                textIndent: "-1000em",
+                flex: "0 0 auto",
+                height: "21px",
+                backgroundPosition: "left -1px",
+                width: "310px",
+                backgroundImage: `url(${url})`
+              }}
+            >
+              {description}
+            </Box>
+          </Link>
+
+          <Box sx={navSx}>
+            {pages?.map(page => (
+              <Link
+                key={page.slug}
+                to={`/${page.slug}`}
+                sx={{
+                  textDecoration: "none",
+                  color: "medium",
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                  "&:hover, &.active_link": {
+                    color: "darkest"
+                  }
+                }}
+                activeClassName="active_link"
+              >
+                {slug(page.slug)}
+              </Link>
+            ))}
+          </Box>
+        </Box>
+      )}
+
+      <Global
+        styles={{
+          body: {
+            overflow: navOpen ? "hidden" : "auto"
+          },
+          ".slider-control-topleft": {
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            justifyContent: "center",
+            pointerEvents: "none"
+          }
+        }}
+      />
+    </Box>
+  );
 };
 
 export default Header;

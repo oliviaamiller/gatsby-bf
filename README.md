@@ -2,10 +2,10 @@
 
 ## Built with:
 
--   gatsby
--   contentful
--   theme ui
--   nuka-carousel
+- gatsby
+- contentful
+- theme ui
+- nuka-carousel
 
 ## 🏥 Health Check
 
